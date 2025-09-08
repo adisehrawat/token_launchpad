@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { buildCurveAndCreateConfig } from '../lib/poolConfig';
 
 export async function POST(request: NextRequest) {
     try {
@@ -11,12 +12,17 @@ export async function POST(request: NextRequest) {
             image: formData.get('image')
         };
 
+
         if (!tokenData.name || !tokenData.symbol || !tokenData.totalSupply) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
                 { status: 400 }
             );
         }
+
+        const configAddress = await buildCurveAndCreateConfig(Number(tokenData.totalSupply));
+
+        const configString = configAddress.toBase58();
         
         return NextResponse.json({
             success: true,
@@ -27,6 +33,7 @@ export async function POST(request: NextRequest) {
                 totalSupply: tokenData.totalSupply,
                 hasImage: !!tokenData.image
             },
+            configAddress: configString,
         });
     } catch (error) {
         console.error('Error processing token creation:', error);
