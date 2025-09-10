@@ -34,8 +34,8 @@ A modern, decentralized token launchpad built on Solana blockchain using Next.js
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd launch
+git clone <https://github.com/adisehrawat/token_launchpad.git>
+cd token_launchpad
 ```
 
 2. Install dependencies:
@@ -62,17 +62,17 @@ bun dev
 
 4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-## 🎨 Theme
 
-The application features a modern **light dark theme** with:
-- Soft slate backgrounds for reduced eye strain
-- Subtle blue tints for a professional appearance
-- High contrast text for excellent readability
-- Responsive design that works on all devices
 
 ## 🔧 Configuration
 
 ### Bonding Curve Configuration
+
+Curve Address :-
+
+```
+configAddress = "AdQWsu7ittQwDqr1aaBHDndisLUksGZMieM3krVU4XRZ"
+```
 
 The platform uses a sophisticated bonding curve configuration that can be customized for different token launches:
 
@@ -164,9 +164,12 @@ src/
 │   ├── api/                    # API routes
 │   │   ├── image-proxy/        # Image proxy endpoint
 │   │   └── pools/             # Pool data endpoint
+        └── route.ts           # Create token endpoint
 │   ├── components/            # Reusable UI components
+│   │   ├── AlertCircle.tsx
 │   │   ├── Input.tsx
 │   │   ├── Label.tsx
+│   │   └── Loader2.ts
 │   │   └── index.ts
 │   ├── context/               # React context providers
 │   ├── hooks/                 # Custom React hooks
@@ -176,21 +179,39 @@ src/
 │   ├── page.tsx              # Main page component
 │   ├── layout.tsx            # Root layout
 │   └── globals.css           # Global styles
-└── lib/
-    └── utils.ts              # Utility functions
 ```
 
 ## 🔌 API Endpoints
 
+### Token Creation (POST)
+- **Endpoint**: `/api`
+- **Method**: `POST`
+- **Purpose**: Create a new token with bonding curve configuration
+- **Request Body**:
+  ```json
+  {
+    "name": "Token Name",
+    "symbol": "SYMBOL",
+    "walletAddress": "wallet_public_key",
+    "uri": "https://example.com/token-metadata.json"
+  }
+  ```
+- **Response**: Returns base64-encoded transaction for wallet signing
+
+
 ### Image Proxy
 - **Endpoint**: `/api/image-proxy`
+- **Method**: `GET`
 - **Purpose**: Secure image loading with CORS handling
 - **Parameters**: `url` - The image URL to proxy
+- **Example**: `/api/image-proxy?url=https://example.com/image.png`
 
 ### Pools Data
 - **Endpoint**: `/api/pools`
+- **Method**: `GET`
 - **Purpose**: Fetch pool data from the blockchain
 - **Parameters**: `config` - Configuration address
+- **Example**: `/api/pools?config=AdQWsu7ittQwDqr1aaBHDndisLUksGZMieM3krVU4XRZ`
 
 ## 🎯 Usage
 
@@ -212,7 +233,6 @@ src/
   - Base and quote supply
   - Migration status
   - Pool address
-- Use "View Details" and "Trade" buttons for pool interactions
 
 ## 🚀 Deployment
 
@@ -228,11 +248,6 @@ pnpm build
 bun build
 ```
 
-### Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## 🔧 Development
 
@@ -243,43 +258,5 @@ Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
-### Environment Variables
-
-Create a `.env.local` file for environment-specific configuration:
-
-```env
-# Add your environment variables here
-NEXT_PUBLIC_SOLANA_RPC_URL=https://api.devnet.solana.com
-NEXT_PUBLIC_CONFIG_ADDRESS=AdQWsu7ittQwDqr1aaBHDndisLUksGZMieM3krVU4XRZ
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🔗 Links
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Solana Documentation](https://docs.solana.com/)
-- [Meteora SDK Documentation](https://docs.meteora.ag/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-
-1. Check the [Issues](https://github.com/your-repo/issues) page
-2. Create a new issue with detailed information
-3. Join our community discussions
-
----
 
 Built with ❤️ using Next.js and Solana
