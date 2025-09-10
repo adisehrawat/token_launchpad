@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import SolanaProvider from "./context/providers";
+import { Toaster } from 'sonner'
 
-const geistSans = Inter({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: 'swap',
-});
-
-const geistMono = Roboto_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: 'swap',
-});
+// Using system fonts to avoid network font downloads in dev/build
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,12 +16,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased p-0 m-0`}
+        className={`antialiased p-0 m-0 bg-slate-900 text-slate-100`}
       >
         <SolanaProvider>
           {children}
+          <Toaster richColors position="top-right" />
         </SolanaProvider>
       </body>
     </html>

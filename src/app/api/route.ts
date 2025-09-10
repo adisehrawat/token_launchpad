@@ -1,39 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { buildCurveAndCreateConfig } from '../lib/poolConfig';
+import { createDbcPool } from '../lib/createpool';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 
 export async function POST(request: NextRequest) {
     try {
-        const formData = await request.formData();
-        
-        const tokenData = {
-            name: formData.get('name'),
-            symbol: formData.get('symbol'),
-            totalSupply: formData.get('totalSupply'),
-            image: formData.get('image')
-        };
+        const body = await request.json();
+        const name: string | undefined = body?.name;
+        const symbol: string | undefined = body?.symbol;
+        const walletAddress: string | undefined = body?.walletAddress;
+        const uri: string | undefined = body?.uri;
 
-
-        if (!tokenData.name || !tokenData.symbol || !tokenData.totalSupply) {
+        if (!name || !symbol || !walletAddress) {
             return NextResponse.json(
-                { error: 'Missing required fields' },
+                { error: 'Missing required fields: name, symbol, walletAddress' },
                 { status: 400 }
             );
         }
 
-        const configAddress = await buildCurveAndCreateConfig(Number(tokenData.totalSupply));
+        const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+        const baseMint = Keypair.generate();
+        const configAddress = "AdQWsu7ittQwDqr1aaBHDndisLUksGZMieM3krVU4XRZ";
 
-        const configString = configAddress.toBase58();
-        
+        const tx = await createDbcPool(
+            configAddress,
+            connection,
+            baseMint,
+            name,
+            symbol,
+            uri ?? 'https://example.com/metadata.json',
+            walletAddress,
+        );
+
+        tx.feePayer = new PublicKey(walletAddress);
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        tx.partialSign(baseMint);
+
+        const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString('base64');
+
         return NextResponse.json({
             success: true,
-            message: 'Token created successfully!',
-            tokenData: {
-                name: tokenData.name,
-                symbol: tokenData.symbol,
-                totalSupply: tokenData.totalSupply,
-                hasImage: !!tokenData.image
-            },
-            configAddress: configString,
+            transaction: serialized,
+            baseMint: baseMint.publicKey.toBase58(),
         });
     } catch (error) {
         console.error('Error processing token creation:', error);
